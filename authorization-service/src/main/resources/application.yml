@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8090
 
 logging:
   level:
@@ -46,8 +46,8 @@ spring:
       client:
         registration:
           google:
-            client-id:
-            client-secret:
+            client-id: "your-secret"
+            client-secret: "your-secret"
           github:
-            client-id:
-            client-secret:
+            client-id: "your-secret"
+            client-secret: "your-secret"

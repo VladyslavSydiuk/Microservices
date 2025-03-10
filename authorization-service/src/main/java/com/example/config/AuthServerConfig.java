@@ -78,7 +78,7 @@ public class AuthServerConfig {
                                 "/css/**",
                                 "/js/**",
                                 "/images/**").permitAll()
-
+                        .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .oauth2Login(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
