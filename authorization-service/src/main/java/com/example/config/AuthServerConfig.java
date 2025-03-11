@@ -64,7 +64,6 @@ public class AuthServerConfig {
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
                 );
-
         return http.build();
     }
 

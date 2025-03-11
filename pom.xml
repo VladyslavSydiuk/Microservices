@@ -5,6 +5,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>authorization-service</module>
+        <module>service-registry</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -38,6 +39,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <spring.boot.maven.plugin.version>3.4.3</spring.boot.maven.plugin.version>
         <spring.boot.dependencies.version>3.4.3</spring.boot.dependencies.version>
+        <spring.cloud.version>2024.0.0</spring.cloud.version>
         <mysql.version>9.2.0</mysql.version>
     </properties>
 
@@ -50,11 +52,16 @@
             <scope>import</scope>
             <type>pom</type>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>${spring.cloud.version}</version>
+            <scope>import</scope>
+            <type>pom</type>
+        </dependency>
 
     </dependencies>
     </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -65,7 +72,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <version>3.4.3</version>
         </dependency>
-
     </dependencies>
 
     <build>
