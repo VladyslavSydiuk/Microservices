@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.model.Role;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -78,7 +79,7 @@ public class AuthServerConfig {
                                 "/css/**",
                                 "/js/**",
                                 "/images/**").permitAll()
-                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/auth/**").hasRole(Role.USER.name())
                         .anyRequest().authenticated())
                 .oauth2Login(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
@@ -137,6 +138,7 @@ public class AuthServerConfig {
             throw new IllegalStateException(ex);
         }
     }
+
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
