@@ -1,6 +1,5 @@
 package com.example.security;
 
-import com.example.model.UserPrincipal;
 import org.springframework.stereotype.Service;
 import com.example.repo.UserRepository;
 import com.example.model.UserEntity;
