@@ -75,15 +75,20 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal> <!-- This goal is to repackage the application as an executable JAR -->
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
-        </pluginManagement>
     </build>
 
 </project>

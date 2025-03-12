@@ -1,23 +1,13 @@
-server:
-  port: 8080
-
-logging:
-  level:
-    org.springframework.security: trace
-
 spring:
+  profiles:
+    active: docker
+
   application:
     name: authorization-service
   jpa:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQLDialect
-
-  datasource:
-    url: jdbc:mysql://localhost:3307/authdb
-    username: root
-    password: password
-    driver-class-name: com.mysql.cj.jdbc.Driver
 
   security:
     user:
@@ -32,3 +22,45 @@ spring:
           github:
             client-id: "secret"
             client-secret: "secret"
+
+
+logging:
+  level:
+    org.springframework.security: trace
+server:
+  port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/authdb
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+
+  datasource:
+    url: jdbc:mysql://mysql-service:3306/authdb
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka/
+
+
+
+
+
+

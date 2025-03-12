@@ -1,9 +1,8 @@
-version: '3.1'
-
 services:
-  db:
+  mysql-service:
     image: mysql:latest
     restart: always
+    container_name: mysql-service
     environment:
       MYSQL_ROOT_USER: user
       MYSQL_ROOT_PASSWORD: password
@@ -16,10 +15,10 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - mysql_network
+      - my-network
 volumes:
   mysql_data:
 
 networks:
-  mysql_network:
+  my-network:
     driver: bridge

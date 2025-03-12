@@ -13,4 +13,9 @@ public class AuthController {
         return "Hello" ;
     }
 
+    @GetMapping("/1")
+    public String free(){
+        return "For all" ;
+    }
+
 }
