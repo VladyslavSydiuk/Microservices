@@ -1,8 +1,6 @@
 package com.example.config;
 
 import com.example.model.Role;
-import com.example.repo.ClientRepository;
-import com.example.repo.JpaRegisteredClientRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -10,7 +8,6 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,7 +46,8 @@ public class AuthServerConfig {
         http
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
-                        authorizationServer.oidc(Customizer.withDefaults())
+                        authorizationServer
+                                .oidc(Customizer.withDefaults())
                 )
                 .authorizeHttpRequests((authorize) ->
                         authorize.anyRequest().authenticated()
@@ -93,21 +91,7 @@ public class AuthServerConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
-    @Primary
-    public JpaRegisteredClientRepository registeredClientRepository(ClientRepository clientRepository) {
-        return new JpaRegisteredClientRepository(clientRepository);
-    }
 
-    private static KeyPair generateRsaKey() {
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            return keyPairGenerator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-    }
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
@@ -122,6 +106,15 @@ public class AuthServerConfig {
         return new ImmutableJWKSet<>(jwkSet);
     }
 
+    private static KeyPair generateRsaKey() {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            return keyPairGenerator.generateKeyPair();
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
