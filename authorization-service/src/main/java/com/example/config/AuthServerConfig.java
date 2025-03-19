@@ -64,8 +64,9 @@ public class AuthServerConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
             throws Exception {
         http
+                .csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/auth/registeredClient/**").permitAll()
+                        .requestMatchers("/test/**", "/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults());
 

@@ -1,52 +1,30 @@
 package com.example.controller;
 
-import com.example.model.Client;
-import com.example.repo.ClientRepository;
-import com.example.repo.JpaRegisteredClientRepository;
+import com.example.dto.UserDTO;
+import com.example.model.UserEntity;
+import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@Validated
 public class AuthController {
 
-    private final ClientRepository clientRepository;
-    private final JpaRegisteredClientRepository registeredClientRepository;
-
+    private final UserService userService;
     @Autowired
-    public AuthController(ClientRepository clientRepository, JpaRegisteredClientRepository registeredClientRepository) {
-        this.clientRepository = clientRepository;
-        this.registeredClientRepository = registeredClientRepository;
+    public AuthController(UserService userService) {
+
+        this.userService = userService;
     }
 
-    @GetMapping("/client")
-    public Client getClient(@RequestParam String clientId) {
-        return clientRepository
-                .findByClientId(clientId)
-                .orElseThrow(() -> new RuntimeException("Client with ID " + clientId + " not found"));
-    }
-
-    @GetMapping("/registeredClient")
-    public RegisteredClient getRegisteredClient(@RequestParam String clientId) {
-        return registeredClientRepository.findById(clientId);
-    }
-
-    @GetMapping("/registered")
-    public RegisteredClient getRegisteredClientByClientId(@RequestParam String clientId) {
-        return registeredClientRepository.findByClientId(clientId);
-    }
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello";
-    }
-
-    @GetMapping("/public")
-    public String free() {
-        return "For all";
+    @PostMapping("/register")
+    ResponseEntity<UserEntity> registerNewUser(@RequestBody UserDTO userDTO){
+        return ResponseEntity.ok(userService.registerNewUser(userDTO));
     }
 }
