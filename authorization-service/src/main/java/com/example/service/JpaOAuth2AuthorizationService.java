@@ -2,7 +2,6 @@ package com.example.service;
 
 import com.example.model.Authorization;
 import com.example.repo.AuthorizationRepository;
-import com.example.repo.JpaRegisteredClientRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,10 +21,12 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
 
 import java.time.Instant;
 import java.util.List;
@@ -33,13 +34,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-@Service
+@Component
 public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService {
     private final AuthorizationRepository authorizationRepository;
-    private final JpaRegisteredClientRepository registeredClientRepository;
+    private final RegisteredClientRepository registeredClientRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JpaOAuth2AuthorizationService(AuthorizationRepository authorizationRepository, JpaRegisteredClientRepository registeredClientRepository) {
+    public JpaOAuth2AuthorizationService(AuthorizationRepository authorizationRepository, RegisteredClientRepository registeredClientRepository) {
         Assert.notNull(authorizationRepository, "authorizationRepository cannot be null");
         Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
         this.authorizationRepository = authorizationRepository;
@@ -49,19 +50,6 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         List<Module> securityModules = SecurityJackson2Modules.getModules(classLoader);
         this.objectMapper.registerModules(securityModules);
         this.objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
-    }
-
-    private static AuthorizationGrantType resolveAuthorizationGrantType(String authorizationGrantType) {
-        if (AuthorizationGrantType.AUTHORIZATION_CODE.getValue().equals(authorizationGrantType)) {
-            return AuthorizationGrantType.AUTHORIZATION_CODE;
-        } else if (AuthorizationGrantType.CLIENT_CREDENTIALS.getValue().equals(authorizationGrantType)) {
-            return AuthorizationGrantType.CLIENT_CREDENTIALS;
-        } else if (AuthorizationGrantType.REFRESH_TOKEN.getValue().equals(authorizationGrantType)) {
-            return AuthorizationGrantType.REFRESH_TOKEN;
-        } else if (AuthorizationGrantType.DEVICE_CODE.getValue().equals(authorizationGrantType)) {
-            return AuthorizationGrantType.DEVICE_CODE;
-        }
-        return new AuthorizationGrantType(authorizationGrantType);
     }
 
     @Override
@@ -118,7 +106,7 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         }
 
         OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(registeredClient)
-                .id(String.valueOf(entity.getId()))
+                .id(entity.getId())
                 .principalName(entity.getPrincipalName())
                 .authorizationGrantType(resolveAuthorizationGrantType(entity.getAuthorizationGrantType()))
                 .authorizedScopes(StringUtils.commaDelimitedListToSet(entity.getAuthorizedScopes()))
@@ -183,7 +171,7 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
 
     private Authorization toEntity(OAuth2Authorization authorization) {
         Authorization entity = new Authorization();
-        entity.setId(Long.valueOf(authorization.getId()));
+        entity.setId(authorization.getId());
         entity.setRegisteredClientId(authorization.getRegisteredClientId());
         entity.setPrincipalName(authorization.getPrincipalName());
         entity.setAuthorizationGrantType(authorization.getAuthorizationGrantType().getValue());
@@ -290,5 +278,18 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex.getMessage(), ex);
         }
+    }
+
+    private static AuthorizationGrantType resolveAuthorizationGrantType(String authorizationGrantType) {
+        if (AuthorizationGrantType.AUTHORIZATION_CODE.getValue().equals(authorizationGrantType)) {
+            return AuthorizationGrantType.AUTHORIZATION_CODE;
+        } else if (AuthorizationGrantType.CLIENT_CREDENTIALS.getValue().equals(authorizationGrantType)) {
+            return AuthorizationGrantType.CLIENT_CREDENTIALS;
+        } else if (AuthorizationGrantType.REFRESH_TOKEN.getValue().equals(authorizationGrantType)) {
+            return AuthorizationGrantType.REFRESH_TOKEN;
+        } else if (AuthorizationGrantType.DEVICE_CODE.getValue().equals(authorizationGrantType)) {
+            return AuthorizationGrantType.DEVICE_CODE;
+        }
+        return new AuthorizationGrantType(authorizationGrantType);
     }
 }

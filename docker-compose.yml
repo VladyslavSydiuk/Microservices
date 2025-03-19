@@ -6,44 +6,54 @@ services:
     container_name: eureka-service
     ports:
       - "8761:8761"
-    networks:
-      - my-network
+
 
   authorization-service:
     build:
       context: ./authorization-service
       dockerfile: Dockerfile
-    container_name: auth_service
+    container_name: authorization-service
     ports:
-      - "8080:8080"
+      - "9090:9090"
     depends_on:
       - eureka-service
       - mysql-service
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka/
-    networks:
-      - my-network
+    extra_hosts:
+      - "authorization-service:127.0.0.1"
+
+#  client-service:
+#    build:
+#      context: ./client-service
+#      dockerfile: Dockerfile
+#    container_name: client-service
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - eureka-service
+#      - authorization-service
+#    restart: on-failure
+#    environment:
+#      OAUTH_ISSUER: "http://127.0.0.1:9090"
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka/
+
 
   mysql-service:
     image: mysql:latest
     restart: always
     container_name: mysql-service
     environment:
-      MYSQL_ROOT_USER: user
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: authdb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-    networks:
-      - my-network
+
 volumes:
   mysql_data:
 
-networks:
-  my-network:
-    driver: bridge
+

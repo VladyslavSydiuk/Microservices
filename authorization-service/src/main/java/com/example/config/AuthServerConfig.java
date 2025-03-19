@@ -1,6 +1,5 @@
 package com.example.config;
 
-import com.example.model.Role;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -15,7 +14,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -47,17 +45,17 @@ public class AuthServerConfig {
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
                         authorizationServer
-                                .oidc(Customizer.withDefaults())
-                )
+                                .oidc(Customizer.withDefaults()))
                 .authorizeHttpRequests((authorize) ->
-                        authorize.anyRequest().authenticated()
-                )
+                        authorize
+                                .anyRequest().authenticated())
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
                 );
+
         return http.build();
     }
 
@@ -65,16 +63,10 @@ public class AuthServerConfig {
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
             throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/login",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**").permitAll()
-                        .requestMatchers("/auth/hello").hasRole(Role.USER.name())
+                        .requestMatchers("/auth/registeredClient/**").permitAll()
                         .anyRequest().authenticated())
-                .oauth2Login(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
 
         return http.build();
@@ -90,8 +82,6 @@ public class AuthServerConfig {
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() {

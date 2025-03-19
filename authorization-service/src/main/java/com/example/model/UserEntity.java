@@ -1,5 +1,6 @@
 package com.example.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,6 +22,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonDeserialize
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

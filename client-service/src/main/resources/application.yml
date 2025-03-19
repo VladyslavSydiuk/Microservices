@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: client-service
+  profiles:
+    active: local
+
+server:
+  port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "secret"
+            client-secret: "secret"
+          github:
+            client-id: "secret"
+            client-secret: "secret"
+          oidc-client:
+            client-id: oidc-client
+            client-secret: secret
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/oidc-client
+            scope: openid,profile
+            provider: my-provider
+        provider:
+          my-provider:
+            issuer-uri: http://127.0.0.1:9090
+
+
+logging:
+  level:
+    org.springframework.security: trace
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  security:
+    user:
+      name: user
+      password: password
+    oauth2:
+      client:
+        registration:
+          oidc-client:
+            client-id: oidc-client
+            client-secret: secret
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/oidc-client
+            scope: openid,profile
+            provider: my-provider
+        provider:
+          my-provider:
+            issuer-uri: http://127.0.0.1:9090
+
+
+logging:
+  level:
+    org.springframework.security: trace
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka/
