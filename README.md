@@ -1,37 +1,91 @@
-# Client Service - User Information Endpoint
+# Microservices Project
 
-This document provides information about the `/me` endpoint in the **Client Service**, which returns details about the currently authenticated and authorized user. The endpoint fetches the user's data from the authorization server, and it will return a response with user-related information like user ID, client ID, issuer, and roles.
+## Microservices Included
+The project consists of the following services:
+- **Authorization Service** – Handles authentication and user registration.
+- **Client Service** – Provides user-related functionalities.
+- **Service Registry** – Manages service discovery and registration (Eureka or similar).
 
-## Endpoint: `GET /client/me`
+## Technologies Used
+- **Spring Boot** – Framework for building microservices.
+- **Spring Boot Authorization Server** – Implements OAuth2 authentication.
+- **Docker** – Containerization for easy deployment.
 
-### Description
+## Installation and Setup
+To set up and run the project locally using **Docker Compose**, follow these steps:
 
-The `/me` endpoint provides details about the currently authenticated and authorized user by fetching relevant information from the OAuth2 authentication token. This token is provided by the authorization server.
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/VladyslavSydiuk/Microservices.git
+   cd Microservices
+   ```
+2. Run the services using Docker Compose:
+   ```sh
+   docker-compose up --build
+   ```
+3. The services should now be accessible.
 
-### Request
+---
 
-**Method**: `GET`  
-**URL**: `/client/me`  
-**Authentication Required**: Yes (OAuth2 Authentication)
+## API Documentation
 
-The request should include the OAuth2 token as part of the authentication process (e.g., as a Bearer token in the Authorization header).
+### 1. Authorization Service
+Handles user authentication and registration.
 
-### Response
+#### **Register a new user**
+- **Endpoint:** `POST /auth/register`
+- **Request Body:**
+  ```json
+  {
+    "username": "exampleUser",
+    "password": "securePassword"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "id": 1,
+    "username": "exampleUser"
+  }
+  ```
+- **Possible Errors:**
+  - `400 Bad Request` if username or password is missing.
 
-The response will include a JSON object with the following fields:
+---
 
-- `sub`: The subject (user ID/username) of the authenticated user (fetched from the token's principal).
-- `client-id`: The client ID from the token’s attributes (aud).
-- `issuer`: The issuer from the token’s attributes (iss).
-- `roles`: A list of roles assigned to the authenticated user (mapped from token authorities).
+### 2. Client Service
+Provides user details based on OAuth2 authentication.
 
-#### Successful Response (200 OK)
+#### **Get current authenticated user**
+- **Endpoint:** `GET /client/me`
+- **Headers:**  
+  `Authorization: Bearer <access_token>`
+- **Response (Success, authenticated user):**
+  ```json
+  {
+    "sub": "user123",
+    "client-id": "my-client-id",
+    "issuer": "https://auth-server.com",
+    "roles": ["ROLE_USER"]
+  }
+  ```
+- **Response (Unauthorized request):**
+  ```json
+  {
+    "error": "User is not authenticated"
+  }
+  ```
+- **Possible Errors:**
+  - `401 Unauthorized` if the token is missing or invalid.
 
-**Example Response**:
-```json
-{
-  "sub": "user123",
-  "client-id": "my-client-id",
-  "issuer": "authorization-server",
-  "roles": ["OIDC_USER","SCOPE_openid","SCOPE_profile"]
-}
+---
+
+### 3. Service Registry
+Used for microservice discovery (e.g., Eureka). No public API endpoints.
+
+---
+
+Let me know if you'd like any modifications or additions! 🚀
+```  
+
+This includes request and response examples for both the **Authorization Service** and **Client Service**. Let me know if you’d like to add error handling details or any additional endpoints! 😊
