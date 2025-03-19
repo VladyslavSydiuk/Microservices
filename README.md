@@ -33,5 +33,5 @@ The response will include a JSON object with the following fields:
   "sub": "user123",
   "client-id": "my-client-id",
   "issuer": "authorization-server",
-  "roles": [""OIDC_USER","SCOPE_openid","SCOPE_profile""]
+  "roles": ["OIDC_USER","SCOPE_openid","SCOPE_profile"]
 }
