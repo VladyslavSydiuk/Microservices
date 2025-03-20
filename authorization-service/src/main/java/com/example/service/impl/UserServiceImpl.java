@@ -21,10 +21,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity registerNewUser(UserDTO userDTO) {
-        return userRepository.save(UserEntity.builder()
-                .username(userDTO.getUsername())
-                .password(passwordEncoder.encode(userDTO.getPassword()))
-                .role(Role.USER)
-                .build());
+        if(userRepository.existsByUsername(userDTO.getUsername())){
+            throw new RuntimeException("User already exists");
+        }else {
+            return userRepository.save(UserEntity.builder()
+                    .username(userDTO.getUsername())
+                    .password(passwordEncoder.encode(userDTO.getPassword()))
+                    .role(Role.USER)
+                    .build());
+        }
+
     }
 }

@@ -24,7 +24,6 @@ spring:
             client-id: "secret"
             client-secret: "secret"
 
-
 logging:
   level:
     org.springframework.security: trace
