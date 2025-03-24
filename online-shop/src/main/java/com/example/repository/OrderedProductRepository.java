@@ -1,8 +1,9 @@
 package com.example.repository;
 
+import com.example.model.OrderedProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrderedProductRepository extends JpaRepository<OrderedProductRepository,Long> {
+public interface OrderedProductRepository extends JpaRepository<OrderedProduct,Long> {
 }

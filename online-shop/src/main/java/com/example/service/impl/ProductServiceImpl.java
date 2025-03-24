@@ -7,17 +7,22 @@ import com.example.repository.ProductRepository;
 import com.example.service.ProductService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductServiceImpl implements ProductService {
+    private final static String PRODUCT_NOT_FOUND = "Product not found!";
 
     private final ProductRepository productRepository;
 
+
     public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
+
     }
 
     @Override
-    public Product addProduct(ProductDTO productDTO) {
+    public Product add(ProductDTO productDTO) {
         return productRepository.save(Product.builder()
                 .productName(productDTO.getProductName())
                 .price(productDTO.getPrice())
@@ -27,13 +32,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product getProductById(Long productId) {
-        return productRepository.findById(productId).orElseThrow(()-> new RuntimeException("Product not found"));
+    public Product findById(Long productId) {
+        return productRepository.findById(productId).orElseThrow(()-> new RuntimeException(PRODUCT_NOT_FOUND));
     }
 
     @Override
-    public Product updateProductById(ProductDTO productDTO, Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(()-> new RuntimeException("Product not found"));
+    public List<Product> findAll() {
+        return productRepository.findAll();
+    }
+
+    @Override
+    public Product updateById(ProductDTO productDTO, Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(()-> new RuntimeException(PRODUCT_NOT_FOUND));
 
         if (productDTO.getProductName() != null){
             product.setProductName(productDTO.getProductName());
@@ -52,9 +62,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteProductById(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(()-> new RuntimeException("Product not found"));
+    public void deleteById(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(()-> new RuntimeException(PRODUCT_NOT_FOUND));
         product.setProductStatus(ProductStatus.UNAVAILABLE);
         productRepository.save(product);
     }
+
 }
+

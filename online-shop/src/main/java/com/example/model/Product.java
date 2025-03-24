@@ -2,6 +2,8 @@ package com.example.model;
 
 import com.example.model.enums.ProductStatus;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,6 +29,7 @@ public class Product {
     private String productName;
     private int price;
     private String productDescription;
+    @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
 
 }

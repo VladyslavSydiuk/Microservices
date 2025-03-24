@@ -1,6 +1,9 @@
 spring:
   application:
     name: online-shop
+  mvc:
+    servlet:
+      path: /api
 
   jpa:
     hibernate:

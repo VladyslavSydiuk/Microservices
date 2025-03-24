@@ -1,6 +1,7 @@
 package com.example.model;
 
 import com.example.model.enums.OrderStatus;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +20,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Entity
-@Table(name = "products")
+@Table(name = "orders")
 @Getter
 @Setter
 @Builder
@@ -32,11 +33,14 @@ public class Order {
     private Long id;
     private Instant orderDate;
     private OrderStatus orderStatus;
-    @OneToMany
-    private List<OrderedProduct> orderedProduct;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderedProduct> orderedProducts;
+
     private String address;
     private String orderDescription;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User customer;
+    private User user;
 }

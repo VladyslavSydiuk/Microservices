@@ -2,12 +2,13 @@ package com.example.service;
 
 import com.example.model.Product;
 import com.example.model.dto.ProductDTO;
-import com.example.repository.ProductRepository;
+import java.util.List;
 
 public interface ProductService {
 
-    Product addProduct(ProductDTO productDTO);
-    Product getProductById(Long productId);
-    Product updateProductById(ProductDTO productDTO, Long productId);
-    void deleteProductById(Long productId);
+    Product add(ProductDTO productDTO);
+    Product findById(Long productId);
+    List<Product> findAll();
+    Product updateById(ProductDTO productDTO, Long productId);
+    void deleteById(Long productId);
 }
