@@ -1,11 +1,13 @@
 package com.example.controller;
 
 import com.example.model.Order;
+import com.example.model.UserPrincipal;
 import com.example.model.dto.OrderDTO;
 import com.example.model.dto.OrderInfoDTO;
 import com.example.service.OrderService;
 import com.example.service.facade.OrderFacade;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,29 +38,29 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getActiveOrder(userId));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<Order>> getAll(@PathVariable Long userId) {
-        return ResponseEntity.ok(orderService.getAll(userId));
+    @GetMapping()
+    public ResponseEntity<List<Order>> getAll(UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(orderService.getAll(userPrincipal.getId()));
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<Order> addProductsToOrder(@RequestBody OrderDTO orderDTO, @PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(orderFacade.addProductsToOrder(orderDTO,userId));
+    @PostMapping()
+    public ResponseEntity<Order> addProductsToOrder(@RequestBody OrderDTO orderDTO, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(orderFacade.addProductsToOrder(orderDTO,userPrincipal.getId()));
     }
-    @PatchMapping("/{userId}")
-    public ResponseEntity<Order> acceptOrder(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(orderService.acceptOrder(userId));
+    @PatchMapping()
+    public ResponseEntity<Order> confirmOrder(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(orderService.confirmOrder(userPrincipal.getId()));
     }
 
-    @PutMapping({"/{userId}"})
-    public ResponseEntity<Void> setInfo(@RequestBody OrderInfoDTO orderInfoDTO, @PathVariable Long userId) {
-        orderService.setInfo(orderInfoDTO, userId);
+    @PutMapping()
+    public ResponseEntity<Void> setInfo(@RequestBody OrderInfoDTO orderInfoDTO, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        orderService.setInfo(orderInfoDTO, userPrincipal.getId());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping()
-    public ResponseEntity<Void> cancelActiveOrder(@PathVariable("userId") Long userId) {
-        orderService.cancelActiveOrder(userId);
+    public ResponseEntity<Void> cancelActiveOrder(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        orderService.cancelActiveOrder(userPrincipal.getId());
         return ResponseEntity.ok().build();
     }
     @DeleteMapping("/{orderId}")

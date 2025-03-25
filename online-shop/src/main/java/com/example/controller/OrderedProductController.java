@@ -1,7 +1,9 @@
 package com.example.controller;
 
+import com.example.model.UserPrincipal;
 import com.example.service.OrderedProductService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,22 +20,24 @@ public class OrderedProductController {
         this.orderedProductService = orderedProductService;
     }
 
-    @DeleteMapping("/{userId}/{productId}")
+    @DeleteMapping("/{productId}")
     public ResponseEntity<Void> deleteProductFromOrder(
-            @PathVariable Long userId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long productId) {
 
-        orderedProductService.deleteProductFromOrderByProductId(userId,productId);
+        orderedProductService.deleteProductFromOrderByProductId(
+                userPrincipal.getId(),
+                productId);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{userId}/{productId}/{amount}")
+    @PatchMapping("/{productId}/{amount}")
     public ResponseEntity<Void> editAmountOfProduct(
-            @PathVariable Long userId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long productId,
             @PathVariable Integer amount) {
 
-        orderedProductService.editAmountOfProduct(userId,productId,amount);
+        orderedProductService.editAmountOfProduct(userPrincipal.getId(),productId,amount);
         return ResponseEntity.ok().build();
     }
 }

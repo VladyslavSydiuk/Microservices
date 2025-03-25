@@ -12,7 +12,7 @@ public interface OrderService {
     Order createOrder(Long userId);
     Order save(Order order);
     void cancelActiveOrder(Long userId);
-    Order acceptOrder(Long userId);
+    Order confirmOrder(Long userId);
     void deleteOrderById(Long orderId);
     Order setInfo(OrderInfoDTO orderInfoDTO, Long userId);
 }

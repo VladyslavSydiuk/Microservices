@@ -53,9 +53,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order acceptOrder(Long userId) {
+    public Order confirmOrder(Long userId) {
         Order order = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.ACTIVE).orElseThrow(() -> new RuntimeException("Order not found"));
-        order.setOrderStatus(OrderStatus.RECEIVED);
+        order.setOrderStatus(OrderStatus.CONFIRMED);
         return orderRepository.save(order);
     }
 
