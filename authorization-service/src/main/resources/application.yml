@@ -1,20 +1,19 @@
 spring:
-  application:
-    name: authorization-service
   profiles:
     active: docker
 
+  application:
+    name: authorization-service
   jpa:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQLDialect
+
   security:
-    oauth2:
-      authorization-server:
-        issuer: http://127.0.0.1:9090
     user:
       name: user
       password: password
+    oauth2:
       client:
         registration:
           google:
@@ -23,18 +22,22 @@ spring:
           github:
             client-id: "secret"
             client-secret: "secret"
+      authorizationserver:
+        issuer: http://127.0.0.1:8080
+
 
 logging:
   level:
     org.springframework.security: trace
 server:
-  port: 9090
+  port: 8080
 
 ---
 spring:
   config:
     activate:
       on-profile: local
+
   datasource:
     url: jdbc:mysql://localhost:3307/authdb
     username: root
@@ -46,6 +49,7 @@ spring:
   config:
     activate:
       on-profile: docker
+
 
   datasource:
     url: jdbc:mysql://mysql-service:3306/authdb

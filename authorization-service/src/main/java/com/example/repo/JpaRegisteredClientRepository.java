@@ -66,7 +66,7 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
         Set<String> clientScopes = StringUtils.commaDelimitedListToSet(
                 client.getScopes());
 
-        RegisteredClient.Builder builder = RegisteredClient.withId(String.valueOf(client.getId()))
+        RegisteredClient.Builder builder = RegisteredClient.withId(client.getId().toString())
                 .clientId(client.getClientId())
                 .clientIdIssuedAt(client.getClientIdIssuedAt())
                 .clientSecret(client.getClientSecret())
