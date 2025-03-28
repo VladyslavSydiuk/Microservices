@@ -1,6 +1,7 @@
 package com.example.config;
 
-import com.example.model.Role;
+import com.example.model.UserEntity;
+import com.example.repo.UserRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -15,13 +16,15 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
-import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -36,6 +39,12 @@ import java.util.UUID;
 @EnableWebSecurity
 public class AuthServerConfig {
 
+    private final UserRepository userRepository;
+
+    public AuthServerConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
@@ -49,13 +58,15 @@ public class AuthServerConfig {
                         authorizationServer
                                 .oidc(Customizer.withDefaults()))
                 .authorizeHttpRequests((authorize) ->
-                        authorize.anyRequest().authenticated())
+                        authorize
+                                .anyRequest().authenticated())
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
                 );
+
         return http.build();
     }
 
@@ -63,16 +74,11 @@ public class AuthServerConfig {
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
             throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
         http
+                .csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/login",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**").permitAll()
-                        .requestMatchers("/auth/hello").hasRole(Role.USER.name())
+                        .requestMatchers("/test/**", "/auth/**").permitAll()
                         .anyRequest().authenticated())
-                .oauth2Login(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
 
         return http.build();
@@ -88,9 +94,15 @@ public class AuthServerConfig {
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-
-
+    private static KeyPair generateRsaKey() {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            return keyPairGenerator.generateKeyPair();
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
         KeyPair keyPair = generateRsaKey();
@@ -104,22 +116,23 @@ public class AuthServerConfig {
         return new ImmutableJWKSet<>(jwkSet);
     }
 
-    private static KeyPair generateRsaKey() {
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            return keyPairGenerator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-    }
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
 
     @Bean
-    public AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+    public JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
+        return new NimbusJwtEncoder(jwkSource);
     }
+
+    @Bean
+    public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+        return context -> {
+            UserEntity user = userRepository.findByUsername(context.getPrincipal().getName()).orElseThrow(()-> new RuntimeException("User not found"));
+            String email = user.getEmail();
+            context.getClaims().claim("email",email);
+        };
+    }
+
 }

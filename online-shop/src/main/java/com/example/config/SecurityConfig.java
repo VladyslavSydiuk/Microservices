@@ -2,6 +2,7 @@ package com.example.config;
 
 import com.example.model.enums.Role;
 import com.example.security.JwtFilter;
+import com.example.security.OAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,9 +12,9 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -23,10 +24,12 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JwtFilter jwtFilter;
+    private final OAuthFilter oAuthFilter;
 
-    public SecurityConfig(UserDetailsService userDetailsService, JwtFilter jwtFilter) {
+    public SecurityConfig(UserDetailsService userDetailsService, JwtFilter jwtFilter, OAuthFilter oAuthFilter) {
         this.userDetailsService = userDetailsService;
         this.jwtFilter = jwtFilter;
+        this.oAuthFilter = oAuthFilter;
     }
 
 
@@ -38,13 +41,17 @@ public class SecurityConfig {
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/api/**").hasAuthority(Role.USER.name())
                         .anyRequest().authenticated())
+                .oauth2Login(oauth2Login ->
+                        oauth2Login
+                                .loginPage("/oauth2/authorization/shop-client"))
+                .oauth2Client(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(oAuthFilter, OAuth2LoginAuthenticationFilter.class)
                 .build();
-
     }
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

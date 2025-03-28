@@ -39,7 +39,7 @@ public class OrderController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Order>> getAll(UserPrincipal userPrincipal) {
+    public ResponseEntity<List<Order>> getAll(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(orderService.getAll(userPrincipal.getId()));
     }
 

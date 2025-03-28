@@ -7,6 +7,7 @@
         <module>authorization-service</module>
         <module>service-registry</module>
         <module>client-service</module>
+        <module>online-shop</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

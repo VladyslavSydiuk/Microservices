@@ -27,7 +27,7 @@ spring:
             client-authentication-method: client_secret_basic
             authorization-grant-type: authorization_code
             redirect-uri: http://localhost:9090/login/oauth2/code/oidc-client
-            scope: openid, profile
+            scope: openid, profile, email
             provider: my-provider
         provider:
           my-provider:

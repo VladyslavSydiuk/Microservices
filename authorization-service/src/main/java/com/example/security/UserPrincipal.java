@@ -40,6 +40,10 @@ public class UserPrincipal implements UserDetails {
     public long getId() {
         return user.getId();
     }
+    @JsonIgnore
+    public String getEmail() {
+        return user.getEmail();
+    }
 
     @Override
     @JsonIgnore

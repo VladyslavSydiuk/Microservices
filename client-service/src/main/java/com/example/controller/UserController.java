@@ -20,8 +20,10 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> getCurrentUser(Principal principal) {
         if (principal instanceof OAuth2AuthenticationToken token) {
             Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("info",token.getPrincipal().getAttributes());
             userInfo.put("sub", token.getPrincipal().getName());
             userInfo.put("client-id", token.getPrincipal().getAttribute("aud"));
+            userInfo.put("email", token.getPrincipal().getAttribute("email"));
             userInfo.put("issuer", token.getPrincipal().getAttribute("iss"));
             userInfo.put("roles", token.getAuthorities()
                     .stream()

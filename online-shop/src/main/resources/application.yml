@@ -1,9 +1,23 @@
 spring:
   application:
     name: online-shop
-  mvc:
-    servlet:
-      path: /api
+
+  security:
+    oauth2:
+      client:
+        registration:
+          shop-client:
+            client-id: shop-client
+            client-secret: secret-shop
+            client-name: shop-client
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8090/login/oauth2/code/shop-client
+            scope: openid, profile
+            provider: my-provider
+        provider:
+          my-provider:
+            issuer-uri: http://127.0.0.1:8080
 
   jpa:
     hibernate:
@@ -14,8 +28,11 @@ spring:
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-server:
-  port: 8080
+
+
 
 jwt:
   expiration: 10000000
+
+server:
+  port: 8090

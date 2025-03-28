@@ -21,11 +21,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity registerNewUser(UserDTO userDTO) {
-        if(userRepository.existsByUsername(userDTO.getUsername())){
+        if (userRepository.existsByUsername(userDTO.getUsername())) {
             throw new RuntimeException("User already exists");
-        }else {
+        } else {
             return userRepository.save(UserEntity.builder()
                     .username(userDTO.getUsername())
+                    .email(userDTO.getEmail())
                     .password(passwordEncoder.encode(userDTO.getPassword()))
                     .role(Role.USER)
                     .build());
