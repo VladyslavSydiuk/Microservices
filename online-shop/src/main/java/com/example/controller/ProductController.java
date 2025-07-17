@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,11 +27,16 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<Product>> getAll() {
+    @GetMapping   public ResponseEntity<List<Product>> getAll() {
         return ResponseEntity.ok(productService.findAll());
     }
 
+    @GetMapping("/{name}")
+    public ResponseEntity<List<Product>> getByProductName(@PathVariable String name) {
+        List<Product> list = new ArrayList<>();
+        list.add(productService.getByProductName(name));
+        return ResponseEntity.ok(list);
+    }
     @PostMapping
     public ResponseEntity<Product> add(@RequestBody ProductDTO productDTO) {
         return ResponseEntity.ok(productService.add(productDTO));

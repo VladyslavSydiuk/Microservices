@@ -28,7 +28,7 @@ services:
   mysql-service:
     image: mysql:latest
     restart: always
-    container_name: mysql-service
+    container_name: pet-mysql-service
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: authdb

@@ -11,9 +11,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ProductDTO {
-    private Long productId;
+
     private String productName;
     private Integer price;
+    private String avatarUrl;
     private String productDescription;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
