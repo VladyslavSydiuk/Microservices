@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.model.Product;
 import com.example.model.dto.ProductDTO;
 import com.example.service.ProductService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,8 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping   public ResponseEntity<List<Product>> getAll() {
+    @GetMapping("/all")
+    public ResponseEntity<List<Product>> getAll() {
         return ResponseEntity.ok(productService.findAll());
     }
 
@@ -50,6 +52,13 @@ public class ProductController {
     public ResponseEntity<Void> delete(@PathVariable("productId") Long productId){
         productService.deleteById(productId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<Product>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(productService.findAll(page, size));
     }
 
 

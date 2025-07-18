@@ -5,6 +5,9 @@ import com.example.model.dto.ProductDTO;
 import com.example.model.enums.ProductStatus;
 import com.example.repository.ProductRepository;
 import com.example.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,6 +43,13 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> findAll() {
         return productRepository.findAll();
     }
+
+    @Override
+    public Page<Product> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findAll(pageable);
+    }
+
 
     @Override
     public Product updateById(ProductDTO productDTO, Long productId) {

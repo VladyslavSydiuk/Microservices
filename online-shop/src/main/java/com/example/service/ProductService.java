@@ -2,6 +2,8 @@ package com.example.service;
 
 import com.example.model.Product;
 import com.example.model.dto.ProductDTO;
+import org.springframework.data.domain.Page;
+
 import java.util.List;
 
 public interface ProductService {
@@ -12,4 +14,5 @@ public interface ProductService {
     Product updateById(ProductDTO productDTO, Long productId);
     void deleteById(Long productId);
     Product getByProductName(String productName);
+    Page<Product> findAll(int page, int size);
 }
