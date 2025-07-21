@@ -57,8 +57,9 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(productService.findAll(page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "all") String categoryName) {
+        return ResponseEntity.ok(productService.findAll(page, size, categoryName));
     }
 
 

@@ -26,3 +26,6 @@ public class CategoryController {
         return ResponseEntity.ok().body(categoryService.getAll());
     }
 }
+
+
+

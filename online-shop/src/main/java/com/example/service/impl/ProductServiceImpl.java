@@ -5,13 +5,16 @@ import com.example.model.dto.ProductDTO;
 import com.example.model.enums.ProductStatus;
 import com.example.repository.ProductRepository;
 import com.example.service.ProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
     private final static String PRODUCT_NOT_FOUND = "Product not found!";
@@ -45,9 +48,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<Product> findAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return productRepository.findAll(pageable);
+    public Page<Product> findAll(int page, int size, String categoryName) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("category.name").ascending());
+        log.info("categoryName: {}", categoryName);
+        log.info("pageable: {}", pageable);
+        if ("all".equalsIgnoreCase(categoryName) || categoryName == null || categoryName.trim().isEmpty()) {
+            return productRepository.findAll(pageable);
+        } else {
+            return productRepository.findByCategoryName(categoryName, pageable);
+        }
     }
 
 
@@ -84,4 +94,3 @@ public class ProductServiceImpl implements ProductService {
     }
 
 }
-

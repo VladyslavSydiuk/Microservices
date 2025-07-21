@@ -14,5 +14,5 @@ public interface ProductService {
     Product updateById(ProductDTO productDTO, Long productId);
     void deleteById(Long productId);
     Product getByProductName(String productName);
-    Page<Product> findAll(int page, int size);
+    Page<Product> findAll(int page, int size, String categoryName);
 }
