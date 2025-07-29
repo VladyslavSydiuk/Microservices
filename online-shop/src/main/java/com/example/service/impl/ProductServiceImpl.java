@@ -49,7 +49,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<Product> findAll(int page, int size, String categoryName) {
-
         Pageable pageable = PageRequest.of(page, size, Sort.by("category.name").ascending());
         log.info("categoryName: {}", categoryName);
         log.info("pageable: {}", pageable);
@@ -60,6 +59,24 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    public Page<Product> findAll(int page, int size, String categoryName, String searchTerm) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("productName").ascending());
+        log.info("categoryName: {}, searchTerm: {}", categoryName, searchTerm);
+        log.info("pageable: {}", pageable);
+        
+        // Якщо пошуковий запит пустий, повертаємо звичайні результати
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return findAll(page, size, categoryName);
+        }
+        
+        // Пошук товарів за назвою з врахуванням категорії
+        if ("all".equalsIgnoreCase(categoryName) || categoryName == null || categoryName.trim().isEmpty()) {
+            return productRepository.findByProductNameContainingIgnoreCase(searchTerm, pageable);
+        } else {
+            return productRepository.findByCategoryNameAndProductNameContainingIgnoreCase(categoryName, searchTerm, pageable);
+        }
+    }
 
     @Override
     public Product updateById(ProductDTO productDTO, Long productId) {

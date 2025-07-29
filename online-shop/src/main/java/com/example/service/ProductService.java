@@ -15,4 +15,5 @@ public interface ProductService {
     void deleteById(Long productId);
     Product getByProductName(String productName);
     Page<Product> findAll(int page, int size, String categoryName);
+    Page<Product> findAll(int page, int size, String categoryName, String searchTerm);
 }

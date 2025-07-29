@@ -58,7 +58,13 @@ public class ProductController {
     public ResponseEntity<Page<Product>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "all") String categoryName) {
+            @RequestParam(defaultValue = "all") String categoryName,
+            @RequestParam(required = false) String searchTerm) {
+        
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            return ResponseEntity.ok(productService.findAll(page, size, categoryName, searchTerm));
+        }
+        
         return ResponseEntity.ok(productService.findAll(page, size, categoryName));
     }
 
