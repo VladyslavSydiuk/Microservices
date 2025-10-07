@@ -2,7 +2,10 @@ package com.example.controller;
 
 import com.example.model.Product;
 import com.example.model.dto.ProductDTO;
+import com.example.model.dto.CreateReviewDTO;
+import com.example.model.dto.ReviewDTO;
 import com.example.service.ProductService;
+import com.example.service.ReviewService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,9 +27,11 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ReviewService reviewService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ReviewService reviewService) {
         this.productService = productService;
+        this.reviewService = reviewService;
     }
 
     @GetMapping("/all")
@@ -33,11 +39,16 @@ public class ProductController {
         return ResponseEntity.ok(productService.findAll());
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/name/{name}")
     public ResponseEntity<List<Product>> getByProductName(@PathVariable String name) {
         List<Product> list = new ArrayList<>();
         list.add(productService.getByProductName(name));
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<Product> getById(@PathVariable("productId") Long productId) {
+        return ResponseEntity.ok(productService.findById(productId));
     }
     @PostMapping
     public ResponseEntity<Product> add(@RequestBody ProductDTO productDTO) {
@@ -68,6 +79,16 @@ public class ProductController {
         return ResponseEntity.ok(productService.findAll(page, size, categoryName));
     }
 
+    @GetMapping("/{productId}/reviews")
+    public ResponseEntity<List<ReviewDTO>> getReviews(@PathVariable("productId") Long productId) {
+        return ResponseEntity.ok(reviewService.getReviews(productId));
+    }
 
-
+    @PostMapping("/{productId}/reviews")
+    public ResponseEntity<ReviewDTO> addReview(
+            @PathVariable("productId") Long productId,
+            @RequestBody CreateReviewDTO body,
+            @RequestHeader(value = "X-User-Name", required = false) String userNameOpt) {
+        return ResponseEntity.status(201).body(reviewService.addReview(productId, body, userNameOpt));
+    }
 }
