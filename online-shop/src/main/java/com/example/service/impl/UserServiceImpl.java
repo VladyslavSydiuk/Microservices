@@ -41,8 +41,13 @@ public class UserServiceImpl implements UserService {
     public String verify(UserDTO userDTO) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword()));
-        if (authentication.isAuthenticated())
-            return jwtService.generateToken(userDTO.getUsername());
+        if (authentication.isAuthenticated()) {
+            // fetch email to embed in JWT claims
+            String email = userRepository.findByUsername(userDTO.getUsername())
+                    .map(User::getEmail)
+                    .orElse(null);
+            return jwtService.generateToken(userDTO.getUsername(), email);
+        }
 
         return "Fail";
 
