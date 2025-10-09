@@ -16,4 +16,8 @@ public interface ProductService {
     Product getByProductName(String productName);
     Page<Product> findAll(int page, int size, String categoryName);
     Page<Product> findAll(int page, int size, String categoryName, String searchTerm);
+
+    // New stock APIs
+    Product updateStock(Long productId, int stock);   // set absolute value
+    Product adjustStock(Long productId, int delta);   // add/subtract
 }

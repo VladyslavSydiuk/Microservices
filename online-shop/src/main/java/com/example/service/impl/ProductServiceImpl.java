@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
                 .price(productDTO.getPrice())
                 .productDescription(productDTO.getProductDescription())
                 .productStatus(ProductStatus.AVAILABLE)
+                .stock(0)
                 .build());
     }
 
@@ -89,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
             product.setProductDescription(productDTO.getProductDescription());
         }
         if (productDTO.getPrice() != null){
-            product.setPrice(product.getPrice());
+            product.setPrice(productDTO.getPrice());
         }
         if (productDTO.getStatus() != null){
             product.setProductStatus(productDTO.getStatus());
@@ -108,6 +110,38 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getByProductName(String productName) {
         return productRepository.findByProductName(productName);
+    }
+
+    @Override
+    @Transactional
+    public Product updateStock(Long productId, int stock) {
+        if (stock < 0) stock = 0;
+        Product p = productRepository.findById(productId).orElseThrow(() -> new RuntimeException(PRODUCT_NOT_FOUND));
+        p.setStock(stock);
+        // auto-status
+        if (p.getStock() == null || p.getStock() <= 0) {
+            p.setProductStatus(ProductStatus.UNAVAILABLE);
+        } else if (p.getProductStatus() == null || p.getProductStatus() == ProductStatus.UNAVAILABLE) {
+            p.setProductStatus(ProductStatus.AVAILABLE);
+        }
+        return productRepository.save(p);
+    }
+
+    @Override
+    @Transactional
+    public Product adjustStock(Long productId, int delta) {
+        Product p = productRepository.findById(productId).orElseThrow(() -> new RuntimeException(PRODUCT_NOT_FOUND));
+        int current = p.getStock() == null ? 0 : p.getStock();
+        long next = (long) current + (long) delta;
+        int clamped = (int) Math.max(0, Math.min(Integer.MAX_VALUE, next));
+        p.setStock(clamped);
+        // auto-status
+        if (p.getStock() == null || p.getStock() <= 0) {
+            p.setProductStatus(ProductStatus.UNAVAILABLE);
+        } else if (p.getProductStatus() == null || p.getProductStatus() == ProductStatus.UNAVAILABLE) {
+            p.setProductStatus(ProductStatus.AVAILABLE);
+        }
+        return productRepository.save(p);
     }
 
 }

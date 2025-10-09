@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,5 +91,38 @@ public class ProductController {
             @RequestBody CreateReviewDTO body,
             @RequestHeader(value = "X-User-Name", required = false) String userNameOpt) {
         return ResponseEntity.status(201).body(reviewService.addReview(productId, body, userNameOpt));
+    }
+
+    public static class StockDTO {
+        public Integer stock;
+    }
+    public static class AdjustStockDTO {
+        public Integer delta;
+    }
+
+    @GetMapping("/{productId}/stock")
+    public ResponseEntity<StockDTO> getStock(@PathVariable Long productId) {
+        Product p = productService.findById(productId);
+        StockDTO dto = new StockDTO();
+        dto.stock = p.getStock();
+        return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/{productId}/stock")
+    public ResponseEntity<StockDTO> setStock(@PathVariable Long productId, @RequestBody StockDTO body) {
+        if (body == null || body.stock == null) return ResponseEntity.badRequest().build();
+        Product updated = productService.updateStock(productId, body.stock);
+        StockDTO dto = new StockDTO();
+        dto.stock = updated.getStock();
+        return ResponseEntity.ok(dto);
+    }
+
+    @PatchMapping("/{productId}/stock")
+    public ResponseEntity<StockDTO> adjustStock(@PathVariable Long productId, @RequestBody AdjustStockDTO body) {
+        if (body == null || body.delta == null) return ResponseEntity.badRequest().build();
+        Product updated = productService.adjustStock(productId, body.delta);
+        StockDTO dto = new StockDTO();
+        dto.stock = updated.getStock();
+        return ResponseEntity.ok(dto);
     }
 }
